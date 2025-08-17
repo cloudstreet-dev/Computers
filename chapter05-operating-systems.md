@@ -4,6 +4,16 @@
 
 An operating system (OS) is the fundamental software layer that manages computer hardware and provides services to applications. It acts as an intermediary between users and hardware, transforming raw computing resources into a convenient, efficient, and secure computing environment. This chapter explores the core concepts of operating systems, their evolution, and the essential services they provide.
 
+### Why Operating Systems Matter
+
+Without an OS, every program would need to:
+- Directly control hardware (complex and error-prone)
+- Manage its own memory (inefficient and insecure)
+- Handle all I/O operations (reinventing the wheel)
+- Coordinate with other programs (chaos)
+
+The OS solves these problems by providing abstractions, resource management, and standardized interfaces.
+
 ## 5.1 What is an Operating System?
 
 An operating system serves multiple roles:
@@ -36,18 +46,24 @@ An operating system serves multiple roles:
 - Sequential execution
 - No user interaction during execution
 - Simple monitor programs
+- **Problem solved**: Manual operation overhead
+- **New problem**: CPU idle during I/O
 
 ### Multiprogramming (1960s)
-- Multiple jobs in memory
-- CPU switches between jobs
-- Better resource utilization
-- Job scheduling algorithms
+- Multiple jobs in memory simultaneously
+- CPU switches between jobs when one waits for I/O
+- Better resource utilization (CPU rarely idle)
+- Job scheduling algorithms emerge
+- **Problem solved**: CPU idle time
+- **New problem**: How to share resources fairly?
 
 ### Time-Sharing (1960s-1970s)
-- Interactive computing
-- Multiple users simultaneously
-- Quick response time
-- Virtual terminals
+- Interactive computing (users get immediate feedback)
+- Multiple users simultaneously via terminals
+- Quick response time through rapid context switching
+- Virtual terminals give illusion of dedicated machine
+- **Examples**: CTSS, Multics, early Unix
+- **Innovation**: Made computing accessible to non-specialists
 
 ### Personal Computers (1980s)
 - Single-user systems
@@ -90,11 +106,13 @@ Examples: Linux, traditional Unix
 Advantages:
 - Fast (no context switches between services)
 - Simple design
+- Direct hardware access
 
 Disadvantages:
-- Large, complex codebase
-- Single failure can crash system
+- Large, complex codebase (millions of lines)
+- Single failure can crash entire system (no isolation)
 - Difficult to maintain and extend
+- Security vulnerabilities affect entire kernel
 
 ### Microkernel
 
@@ -207,25 +225,40 @@ shmget()    // Get shared memory
 
 ### System Call Implementation
 
-1. **User program** calls library function
-2. **Library** prepares parameters and executes trap
-3. **Trap** switches to kernel mode
-4. **Kernel** executes system call handler
-5. **Return** to user mode with results
+1. **User program** calls library function (e.g., fopen())
+2. **Library** prepares parameters and executes trap instruction
+3. **Trap** switches CPU to kernel mode (privileged execution)
+4. **Kernel** validates parameters and executes system call handler
+5. **Return** to user mode with results or error code
+
+**Performance note**: System calls are expensive (~1000x slower than function calls) due to:
+- Mode switching overhead
+- Parameter validation
+- Cache effects
+- TLB flushes
 
 Example: Reading a file
 ```c
 // User code
 char buffer[100];
 int fd = open("file.txt", O_RDONLY);
-read(fd, buffer, 100);
+if (fd < 0) {
+    perror("open failed");
+    exit(1);
+}
+int bytes = read(fd, buffer, 100);
+close(fd);
 
-// What happens:
+// What happens under the hood:
 // 1. open() library function called
-// 2. Parameters placed in registers
-// 3. Trap instruction executed (int 0x80 or syscall)
-// 4. Kernel opens file, returns file descriptor
-// 5. read() follows similar process
+// 2. Parameters placed in registers (filename ptr, flags)
+// 3. System call number placed in register (e.g., rax on x86-64)
+// 4. Trap instruction executed (int 0x80 or syscall)
+// 5. CPU switches to kernel mode
+// 6. Kernel validates parameters (file exists? permissions?)
+// 7. Kernel opens file, creates file descriptor
+// 8. Return to user mode with fd or error code
+// 9. read() follows similar process
 ```
 
 ## 5.5 Process Management
@@ -239,12 +272,14 @@ A process is a program in execution, the unit of work in an OS.
   New ---------> Ready
                   ↑ ↓  dispatch
       interrupt   | |
-                  | ↓
+    (time slice)  | ↓
                 Running
                   ↓ |
-            exit  | | I/O or event
+            exit  | | I/O or event wait
                   ↓ ↓
   Terminated    Waiting
+                  ↑ |
+                  +-+ I/O or event completion
 ```
 
 States explained:

@@ -4,6 +4,14 @@
 
 Programming is the art and science of instructing computers to solve problems. While previous chapters explored how computers work at the hardware and system level, this chapter introduces the fundamental concepts of programming that transcend any particular language. We'll explore programming paradigms, core concepts, and the principles that guide the creation of correct, efficient, and maintainable software.
 
+### Key Programming Principles
+
+1. **Abstraction**: Hide complexity behind simple interfaces
+2. **Modularity**: Break problems into manageable pieces
+3. **DRY (Don't Repeat Yourself)**: Avoid code duplication
+4. **KISS (Keep It Simple, Stupid)**: Favor simplicity over cleverness
+5. **YAGNI (You Aren't Gonna Need It)**: Don't over-engineer
+
 ## 9.1 Programming Paradigms
 
 ### Imperative Programming
@@ -12,6 +20,7 @@ Programs as sequences of commands that change state:
 
 ```c
 // Imperative style - step by step instructions
+// "How" to compute factorial
 int factorial(int n) {
     int result = 1;
     for (int i = 2; i <= n; i++) {
@@ -19,6 +28,12 @@ int factorial(int n) {
     }
     return result;
 }
+
+// Characteristics:
+// - Explicit control flow
+// - Mutable state
+// - Sequential execution
+// - Close to machine architecture
 
 // Procedural programming (imperative subset)
 struct Account {
@@ -85,7 +100,7 @@ public:
     // Polymorphism - override behavior
     bool withdraw(double amount) override {
         if (withdrawalsThisMonth >= 6) {
-            return false;  // Limit exceeded
+            return false;  // Monthly limit exceeded
         }
         if (BankAccount::withdraw(amount)) {
             withdrawalsThisMonth++;
@@ -106,9 +121,16 @@ Computation as evaluation of mathematical functions:
 
 ```haskell
 -- Pure functional style (Haskell)
+-- "What" factorial is, not "how" to compute it
 factorial :: Integer -> Integer
 factorial 0 = 1
 factorial n = n * factorial (n - 1)
+
+-- Characteristics:
+-- - No side effects (pure functions)
+-- - Immutable data
+-- - Function composition
+-- - Declarative style
 
 -- Higher-order functions
 map :: (a -> b) -> [a] -> [b]
@@ -132,14 +154,14 @@ Functional concepts in modern languages:
 # Python functional features
 from functools import reduce
 
-# Lambda functions
+# Lambda functions (anonymous functions)
 square = lambda x: x ** 2
 
-# Map, filter, reduce
+# Map, filter, reduce - functional trinity
 numbers = [1, 2, 3, 4, 5]
-squared = list(map(lambda x: x ** 2, numbers))
-evens = list(filter(lambda x: x % 2 == 0, numbers))
-sum_all = reduce(lambda x, y: x + y, numbers)
+squared = list(map(lambda x: x ** 2, numbers))  # [1, 4, 9, 16, 25]
+evens = list(filter(lambda x: x % 2 == 0, numbers))  # [2, 4]
+sum_all = reduce(lambda x, y: x + y, numbers)  # 15
 
 # List comprehensions (functional-inspired)
 squared_evens = [x ** 2 for x in numbers if x % 2 == 0]
@@ -183,11 +205,17 @@ sibling(X, Y) :- parent(Z, X), parent(Z, Y), X \= Y.
 
 **Static Typing** (compile-time checking):
 
+Advantages:
+- Catch errors early (at compile time)
+- Better performance (no runtime type checks)
+- Better IDE support (autocomplete, refactoring)
+- Self-documenting code
+
 ```java
 // Java - statically typed
 int count = 42;
 String name = "Alice";
-// count = "Bob";  // Compile error!
+// count = "Bob";  // Compile error - type mismatch!
 
 List<Integer> numbers = new ArrayList<>();
 numbers.add(10);
@@ -195,6 +223,12 @@ numbers.add(10);
 ```
 
 **Dynamic Typing** (runtime checking):
+
+Advantages:
+- More flexible
+- Faster development
+- Less verbose
+- Duck typing ("If it quacks like a duck...")
 
 ```python
 # Python - dynamically typed

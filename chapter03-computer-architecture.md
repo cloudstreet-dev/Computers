@@ -4,6 +4,14 @@
 
 Computer architecture bridges the gap between the digital logic circuits we explored in the previous chapter and the software that runs on modern computers. It defines how a computer's components work together to execute programs. This chapter examines the fundamental concepts of computer organization, from the basic von Neumann architecture to modern processor designs with multiple cores, caches, and sophisticated instruction execution strategies.
 
+### Real-World Impact
+
+Architectural decisions affect everything from battery life in mobile devices to the performance of data centers:
+- **Cache design** determines whether your game runs at 30 or 60 FPS
+- **Pipeline depth** affects both performance and power consumption
+- **Branch prediction** can make a 50% difference in real-world performance
+- **Memory bandwidth** often limits AI and scientific computing more than CPU speed
+
 ## 3.1 The von Neumann Architecture
 
 In 1945, John von Neumann described a computer architecture that remains the foundation of most modern computers. The key innovation was the stored-program concept: both data and instructions are stored in the same memory.
@@ -32,9 +40,11 @@ In 1945, John von Neumann described a computer architecture that remains the fou
 ### The von Neumann Bottleneck
 
 The single bus connecting CPU and memory creates a bottleneck:
-- CPU often waits for memory access
+- CPU often waits for memory access (CPU: 1 ns, RAM: 100 ns)
 - Instructions and data compete for bus bandwidth
 - Modern architectures use caches and parallel buses to mitigate this
+
+**Real-world example**: A modern CPU can execute 4+ instructions per cycle at 4 GHz (16 billion ops/sec), but RAM delivers only ~20 GB/s. Without caches, the CPU would be idle 99% of the time!
 
 ## 3.2 The Central Processing Unit (CPU)
 
@@ -104,16 +114,22 @@ The fundamental CPU operation cycle:
 
 **Clock Speed**: Cycles per second (Hz)
 - Modern CPUs: 2-5 GHz typically
+- Note: Higher clock ≠ better performance (Pentium 4 vs. Core 2)
 
 **Instructions Per Cycle (IPC)**: Average instructions completed per clock cycle
 - Varies by workload and architecture
 - Modern CPUs: 2-4 IPC common
+- Superscalar processors can exceed 1 IPC
 
 **MIPS/FLOPS**: Millions of Instructions/Floating-point Operations Per Second
+- Misleading metric: different ISAs have different instruction complexity
 
 **CPI (Cycles Per Instruction)**: Inverse of IPC
 ```
 Execution Time = Instruction Count × CPI × Clock Period
+
+Amdahl's Law: Speedup = 1 / ((1 - P) + P/S)
+where P = parallel portion, S = speedup of that portion
 ```
 
 ## 3.3 Memory Hierarchy
@@ -124,8 +140,9 @@ Memory systems balance speed, capacity, and cost through a hierarchy:
 
 1. **Registers**
    - Size: ~1 KB
-   - Access: 1 cycle
+   - Access: 0 cycles (same cycle as instruction)
    - Technology: Flip-flops
+   - Cost: ~$1000/MB equivalent
 
 2. **L1 Cache**
    - Size: 32-64 KB per core
@@ -144,13 +161,16 @@ Memory systems balance speed, capacity, and cost through a hierarchy:
 
 5. **Main Memory (RAM)**
    - Size: 8-64 GB typical
-   - Access: 100-300 cycles
-   - Technology: DRAM
+   - Access: 100-300 cycles (~50-100 ns)
+   - Technology: DRAM (requires refresh)
+   - Bandwidth: DDR4-3200 = 25.6 GB/s theoretical
 
 6. **Secondary Storage (SSD/HDD)**
    - Size: 256 GB - several TB
-   - Access: 10,000+ cycles (SSD), millions (HDD)
+   - Access: 10,000+ cycles (SSD: ~100 μs), millions (HDD: ~10 ms)
    - Persistent storage
+   - SSD: 500 MB/s - 7 GB/s (NVMe)
+   - HDD: 100-200 MB/s sequential
 
 ### Cache Organization
 
@@ -176,9 +196,14 @@ Cache Line = (Memory Address) mod (Number of Cache Lines)
 When cache is full, which line to evict?
 
 - **LRU (Least Recently Used)**: Replace oldest accessed
+  - Good for temporal locality
+  - Complex to implement perfectly (often use pseudo-LRU)
 - **FIFO (First In First Out)**: Replace oldest loaded
+  - Simple but ignores access patterns
 - **Random**: Simple but unpredictable
+  - Surprisingly effective, avoids pathological cases
 - **LFU (Least Frequently Used)**: Replace least accessed
+  - Can get stuck on old frequently-used data
 
 ### Cache Coherence
 
@@ -199,18 +224,22 @@ The ISA defines the interface between hardware and software:
 **CISC (Complex Instruction Set Computer)**
 - Examples: x86, VAX
 - Features:
-  - Variable-length instructions
+  - Variable-length instructions (1-15 bytes in x86)
   - Complex addressing modes
-  - Many specialized instructions
+  - Many specialized instructions (>1000 in modern x86)
   - Microcode implementation
+- Philosophy: "Let hardware do complex operations"
 
 **RISC (Reduced Instruction Set Computer)**
 - Examples: ARM, RISC-V, MIPS
 - Features:
-  - Fixed-length instructions
+  - Fixed-length instructions (32 bits typical)
   - Simple addressing modes
-  - Load/store architecture
-  - Hardware implementation
+  - Load/store architecture (only load/store access memory)
+  - Hardware implementation (no microcode)
+- Philosophy: "Keep hardware simple, let compiler optimize"
+
+**Modern reality**: x86 CPUs translate CISC to RISC-like micro-ops internally!
 
 ### Instruction Types
 

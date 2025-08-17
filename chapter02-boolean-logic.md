@@ -4,6 +4,14 @@
 
 Boolean logic forms the mathematical foundation of digital computing. Named after mathematician George Boole, this algebra deals with binary values and logical operations. Every computation a computer performs ultimately reduces to billions of simple Boolean operations executed by transistors. This chapter explores Boolean algebra, logic gates, and how these fundamental concepts combine to create the complex digital systems that power modern computers.
 
+### Chapter Objectives
+By the end of this chapter, you will understand:
+- How Boolean algebra provides the mathematical foundation for digital circuits
+- How logic gates implement Boolean operations in hardware
+- How to simplify Boolean expressions for efficient circuit design
+- How combinational and sequential circuits form the building blocks of processors
+- The relationship between Boolean logic and the binary system from Chapter 1
+
 ## 2.1 Boolean Algebra Fundamentals
 
 Boolean algebra operates on binary variables that can only have two values: true (1) or false (0). Unlike regular algebra with infinite numbers, Boolean algebra's simplicity makes it perfect for digital circuits.
@@ -14,6 +22,8 @@ The three fundamental operations are:
 
 **NOT (Negation)**
 - Symbol: ¬ or ' or overbar
+- Function: Inverts the input value
+- Real-world analogy: A light switch that turns on when off and vice versa
 - Truth table:
 ```
 A | ¬A
@@ -21,9 +31,12 @@ A | ¬A
 0 | 1
 1 | 0
 ```
+- Circuit behavior: Output is HIGH when input is LOW
 
 **AND (Conjunction)**
 - Symbol: ∧ or · or &
+- Function: Output is true only when ALL inputs are true
+- Real-world analogy: A security system requiring both a keycard AND a PIN
 - Truth table:
 ```
 A | B | A∧B
@@ -33,9 +46,12 @@ A | B | A∧B
 1 | 0 | 0
 1 | 1 | 1
 ```
+- Circuit behavior: Output is HIGH only when both inputs are HIGH
 
 **OR (Disjunction)**
 - Symbol: ∨ or +
+- Function: Output is true when AT LEAST ONE input is true
+- Real-world analogy: A doorbell that rings when either the front OR back button is pressed
 - Truth table:
 ```
 A | B | A∨B
@@ -45,6 +61,7 @@ A | B | A∨B
 1 | 0 | 1
 1 | 1 | 1
 ```
+- Circuit behavior: Output is HIGH when any input is HIGH
 
 ### Derived Operations
 
@@ -138,9 +155,11 @@ F = A·1           [Complement]
 F = A             [Identity]
 ```
 
+**Practical interpretation**: This expression says "A AND B, OR A AND NOT B", which simplifies to just "A" regardless of B's value. This insight can reduce a circuit from 5 gates to just a wire!
+
 ### Karnaugh Maps (K-Maps)
 
-K-Maps provide a visual method for simplifying Boolean expressions for up to 4-6 variables.
+K-Maps provide a visual method for simplifying Boolean expressions for up to 4-6 variables. They work by arranging truth table values in a grid where adjacent cells differ by only one variable (Gray code ordering), making patterns easy to spot.
 
 Example for F = ∑(0,1,2,6):
 
@@ -213,8 +232,8 @@ Combinational circuits produce outputs that depend only on current inputs, with 
 ### Half Adder
 
 Adds two single bits:
-- Sum = A ⊕ B
-- Carry = A ∧ B
+- Sum = A ⊕ B (gives the least significant bit)
+- Carry = A ∧ B (gives the overflow to next position)
 
 ```
 Inputs: A, B
@@ -227,11 +246,23 @@ A ----+----[XOR]---- Sum
 B ----+
 ```
 
+**Truth Table:**
+```
+A | B | Sum | Carry
+--|---|-----|------
+0 | 0 |  0  |  0
+0 | 1 |  1  |  0
+1 | 0 |  1  |  0
+1 | 1 |  0  |  1    (1+1=10 in binary)
+```
+
 ### Full Adder
 
-Adds three bits (two inputs plus carry-in):
+Adds three bits (two inputs plus carry-in from previous position):
 - Sum = A ⊕ B ⊕ Cin
 - Cout = (A ∧ B) ∨ (Cin ∧ (A ⊕ B))
+
+**Why we need it**: When adding multi-bit numbers, we need to handle the carry from each bit position. The full adder is the building block for multi-bit addition.
 
 ### Ripple Carry Adder
 
@@ -275,22 +306,28 @@ Opposite of decoder - converts active input line to binary code.
 
 ### Arithmetic Logic Unit (ALU)
 
-Performs arithmetic and logical operations based on control signals:
+The ALU is the computational heart of a CPU, performing arithmetic and logical operations based on control signals:
 
 ```
 Inputs: A[n], B[n], Operation[k]
 Output: Result[n], Flags (Zero, Negative, Carry, Overflow)
 
 Operations:
-- ADD: Result = A + B
-- SUB: Result = A - B
-- AND: Result = A ∧ B
-- OR:  Result = A ∨ B
-- XOR: Result = A ⊕ B
-- NOT: Result = ¬A
-- SHL: Result = A << 1
-- SHR: Result = A >> 1
+- ADD: Result = A + B         (arithmetic addition)
+- SUB: Result = A - B         (arithmetic subtraction)
+- AND: Result = A ∧ B         (bitwise AND)
+- OR:  Result = A ∨ B         (bitwise OR)
+- XOR: Result = A ⊕ B         (bitwise XOR)
+- NOT: Result = ¬A            (bitwise NOT)
+- SHL: Result = A << 1        (shift left = multiply by 2)
+- SHR: Result = A >> 1        (shift right = divide by 2)
 ```
+
+**Flags explained:**
+- Zero: Set when result equals zero
+- Negative: Set when result is negative (MSB = 1 in two's complement)
+- Carry: Set when unsigned operation overflows
+- Overflow: Set when signed operation overflows
 
 ## 2.6 Sequential Circuits
 

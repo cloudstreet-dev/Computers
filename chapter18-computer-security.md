@@ -216,9 +216,11 @@ class VulnerabilityExamples:
     
     def sql_injection_vulnerable(self, username, password):
         """Example of SQL injection vulnerability"""
-        # VULNERABLE CODE - DO NOT USE
+        # VULNERABLE CODE - DO NOT USE IN PRODUCTION
+        # This example is for educational purposes only
         query = f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'"
-        # Input: username = "admin' --" bypasses password check!
+        # Attack example: username = "admin' --" bypasses password check!
+        # Attack example: username = "'; DROP TABLE users; --" destroys data!
         return query
     
     def sql_injection_secure(self, username, password):

@@ -4,6 +4,15 @@
 
 Data structures are fundamental building blocks of computer programs, providing organized ways to store and access data efficiently. The choice of data structure profoundly impacts program performance, memory usage, and code complexity. This chapter explores essential data structures, their implementations, trade-offs, and applications, providing the foundation for understanding how to organize data for optimal algorithmic performance.
 
+### The Art of Choosing Data Structures
+
+Selecting the right data structure is crucial for efficient algorithms. Consider these factors:
+- **Access patterns**: Random access? Sequential? From both ends?
+- **Operation frequency**: More reads or writes? Insertions or deletions?
+- **Memory constraints**: Can you afford extra space for performance?
+- **Data relationships**: Hierarchical? Linear? Network?
+- **Performance requirements**: Average case or worst case guarantees?
+
 ## 10.1 Arrays and Dynamic Arrays
 
 ### Static Arrays
@@ -22,14 +31,21 @@ int matrix[10][20];
 // matrix[i][j] = *(matrix + i * 20 + j)
 
 // Advantages:
-// - O(1) random access
-// - Cache-friendly for sequential access
+// - O(1) random access via index
+// - Cache-friendly for sequential access (spatial locality)
 // - No memory overhead per element
+// - Simple and fast
 
 // Disadvantages:
-// - Fixed size
-// - Insertion/deletion expensive O(n)
+// - Fixed size (must know maximum size at compile time)
+// - Insertion/deletion expensive O(n) - requires shifting
 // - Wasted space if not fully utilized
+
+// When to use:
+// - Size is known and fixed
+// - Need fast random access
+// - Data is accessed sequentially
+// - Examples: lookup tables, fixed-size buffers, matrices
 ```
 
 ### Dynamic Arrays (Vectors)
@@ -100,15 +116,18 @@ public:
 };
 
 // Amortized O(1) append analysis:
-// n insertions: 1 + 2 + 4 + 8 + ... + n = 2n - 1
+// Cost of n insertions: 1 + 2 + 4 + 8 + ... + n = 2n - 1
 // Average per insertion: (2n - 1) / n ≈ 2 = O(1)
+// 
+// This is why languages like Python's list, Java's ArrayList,
+// and C++'s vector are so efficient for append operations!
 ```
 
 ## 10.2 Linked Lists
 
 ### Singly Linked List
 
-Nodes connected by pointers:
+Nodes connected by pointers, trading random access for dynamic size and efficient insertion/deletion:
 
 ```c
 typedef struct Node {
@@ -298,11 +317,19 @@ void rotate(CircularList* list) {
         list->tail = list->tail->next;
     }
 }
+
+// Applications:
+// - Round-robin process scheduling
+// - Circular buffers for audio/video streaming
+// - Multiplayer game turn management
+// - Implementing undo/redo with fixed history size
 ```
 
 ## 10.3 Stacks and Queues
 
-### Stack (LIFO)
+### Stack (LIFO - Last In, First Out)
+
+Fundamental for function calls, expression evaluation, and backtracking:
 
 ```python
 class Stack:
@@ -330,7 +357,9 @@ class Stack:
 
 # Stack applications
 def is_balanced(expression):
-    """Check if parentheses are balanced"""
+    """Check if parentheses are balanced
+    Example: '{[()]}' is balanced, '{[(])}' is not
+    """
     stack = Stack()
     pairs = {'(': ')', '[': ']', '{': '}'}
     
@@ -346,7 +375,9 @@ def is_balanced(expression):
     return stack.is_empty()
 
 def evaluate_postfix(expression):
-    """Evaluate postfix expression"""
+    """Evaluate postfix expression
+    Example: '3 4 + 2 *' evaluates to (3+4)*2 = 14
+    """
     stack = Stack()
     
     for token in expression.split():
@@ -367,7 +398,9 @@ def evaluate_postfix(expression):
     return stack.pop()
 ```
 
-### Queue (FIFO)
+### Queue (FIFO - First In, First Out)
+
+Essential for breadth-first search, task scheduling, and buffering:
 
 ```cpp
 template<typename T>

@@ -4,18 +4,26 @@
 
 Algorithms are precise sequences of steps for solving computational problems. They form the foundation of computer science, determining how efficiently we can process data, make decisions, and solve complex problems. This chapter explores fundamental algorithms, analyzes their complexity, and examines problem-solving strategies that apply across different domains. Understanding algorithms and their analysis is crucial for writing efficient software and recognizing computational limits.
 
+### Key Insights
+- **Algorithm efficiency matters**: The difference between O(n) and O(n²) can mean milliseconds vs. hours
+- **No single best algorithm**: Trade-offs exist between time, space, and simplicity
+- **Patterns recur**: Master a few key techniques (divide-and-conquer, dynamic programming, greedy) and apply them widely
+- **Limits exist**: Some problems are inherently hard (NP-complete) or impossible (halting problem)
+
 ## 11.1 Algorithm Analysis
 
 ### Big O Notation
 
-Describes upper bound of growth rate:
+Describes upper bound of growth rate as input size approaches infinity:
 
 ```python
 # O(1) - Constant time
+# Time doesn't change with input size
 def get_first(arr):
     return arr[0] if arr else None
 
 # O(log n) - Logarithmic time
+# Halves the search space each iteration
 def binary_search(arr, target):
     left, right = 0, len(arr) - 1
     
@@ -24,13 +32,14 @@ def binary_search(arr, target):
         if arr[mid] == target:
             return mid
         elif arr[mid] < target:
-            left = mid + 1
+            left = mid + 1  # Search right half
         else:
-            right = mid - 1
+            right = mid - 1  # Search left half
     
-    return -1
+    return -1  # Not found
 
 # O(n) - Linear time
+# Must examine each element at least once
 def find_max(arr):
     if not arr:
         return None
@@ -42,25 +51,44 @@ def find_max(arr):
     return max_val
 
 # O(n log n) - Linearithmic time
+# Optimal for comparison-based sorting
 def merge_sort(arr):
     if len(arr) <= 1:
         return arr
     
     mid = len(arr) // 2
-    left = merge_sort(arr[:mid])
-    right = merge_sort(arr[mid:])
+    left = merge_sort(arr[:mid])    # Divide
+    right = merge_sort(arr[mid:])   # Divide
     
-    return merge(left, right)
+    return merge(left, right)        # Conquer
+
+def merge(left, right):
+    """Merge two sorted arrays"""
+    result = []
+    i = j = 0
+    
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
 
 # O(n²) - Quadratic time
+# Nested loops over the input
 def selection_sort(arr):
     n = len(arr)
     for i in range(n):
         min_idx = i
-        for j in range(i + 1, n):
+        for j in range(i + 1, n):  # Find minimum in unsorted portion
             if arr[j] < arr[min_idx]:
                 min_idx = j
-        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]  # Swap
     return arr
 
 # O(n³) - Cubic time
@@ -76,14 +104,16 @@ def matrix_multiply(A, B):
     return C
 
 # O(2ⁿ) - Exponential time
+# Doubles with each additional element
 def power_set(s):
     if not s:
-        return [[]]
+        return [[]]  # Empty set
     
     first = s[0]
     rest = s[1:]
     rest_subsets = power_set(rest)
     
+    # Include subsets without first, and subsets with first
     return rest_subsets + [[first] + subset for subset in rest_subsets]
 
 # O(n!) - Factorial time
@@ -103,17 +133,21 @@ def permutations(arr):
 ### Other Complexity Notations
 
 ```python
-# Big Omega (Ω) - Lower bound
-# Ω(n log n) for comparison-based sorting
+# Big Omega (Ω) - Lower bound (best case)
+# Example: Ω(n log n) for comparison-based sorting
+# No comparison sort can do better than n log n comparisons
 
-# Big Theta (Θ) - Tight bound
-# Θ(n) for linear search in average case
+# Big Theta (Θ) - Tight bound (exact growth rate)
+# Example: Θ(n) for linear search average case
+# Will always need to check ~n/2 elements on average
 
 # Little o - Strict upper bound
-# o(n²) means grows slower than n²
+# o(n²) means grows strictly slower than n²
+# Example: n log n is o(n²)
 
-# Little omega (ω) - Strict lower bound
-# ω(n) means grows faster than n
+# Little omega (ω) - Strict lower bound  
+# ω(n) means grows strictly faster than n
+# Example: n² is ω(n)
 
 # Amortized Analysis
 class DynamicArray:
@@ -198,6 +232,7 @@ void bubble_sort(int arr[], int n) {
 }
 
 // Insertion Sort - O(n²) worst, O(n) best
+// Excellent for small or nearly sorted arrays
 void insertion_sort(int arr[], int n) {
     for (int i = 1; i < n; i++) {
         int key = arr[i];

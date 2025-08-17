@@ -21,6 +21,14 @@ This positional notation system, where the position of a digit determines its co
 
 Computers use binary (base 2) because electronic circuits have two stable states: on and off, high voltage and low voltage, or simply 1 and 0. Binary uses only two digits: 0 and 1.
 
+### Why Binary?
+
+Binary is ideal for computers because:
+- **Reliability**: Two states are easier to distinguish than ten, reducing errors
+- **Simplicity**: Binary logic gates are simpler to design and manufacture
+- **Noise immunity**: Digital signals can tolerate more electrical noise
+- **Boolean algebra**: Maps directly to logical operations (AND, OR, NOT)
+
 ### Understanding Binary
 
 Each position in a binary number represents a power of 2:
@@ -32,14 +40,23 @@ The binary number 1101₂ equals:
 - 1 × 2⁰ = 1
 - Total: 13₁₀
 
+**Quick conversion tip**: To convert decimal to binary, repeatedly divide by 2 and track remainders:
+```
+13 ÷ 2 = 6 remainder 1
+6  ÷ 2 = 3 remainder 0
+3  ÷ 2 = 1 remainder 1
+1  ÷ 2 = 0 remainder 1
+Reading upward: 1101₂
+```
+
 ### Binary Arithmetic
 
 **Addition:**
 ```
-  1011
-+ 0110
+  1011  (11 in decimal)
++ 0110  (6 in decimal)
 ------
- 10001
+ 10001  (17 in decimal)
 ```
 
 Rules:
@@ -47,6 +64,21 @@ Rules:
 - 0 + 1 = 1
 - 1 + 0 = 1
 - 1 + 1 = 10 (0 with carry 1)
+- 1 + 1 + 1 = 11 (1 with carry 1)
+
+**Subtraction:**
+```
+  1011  (11 in decimal)
+- 0110  (6 in decimal)
+------
+  0101  (5 in decimal)
+```
+
+Rules:
+- 0 - 0 = 0
+- 1 - 0 = 1
+- 1 - 1 = 0
+- 0 - 1 = 1 (with borrow from left)
 
 **Multiplication:**
 ```
@@ -126,6 +158,16 @@ Advantages:
 - Addition works the same for positive and negative numbers
 - The range for n bits is -2^(n-1) to 2^(n-1) - 1
 
+**Quick trick**: To find the two's complement, scan from right to left, copy all bits up to and including the first 1, then invert all remaining bits.
+
+Example with 8 bits:
+- +12 = 00001100
+- -12: Keep rightmost 100, invert rest → 11110100
+
+**Overflow detection**: In two's complement, overflow occurs when:
+- Adding two positive numbers yields a negative result
+- Adding two negative numbers yields a positive result
+
 ## 1.6 Floating-Point Numbers
 
 Real numbers with fractional parts require special representation. The IEEE 754 standard defines floating-point formats.
@@ -140,17 +182,28 @@ The number is calculated as: (-1)^sign × 1.mantissa × 2^(exponent-127)
 
 Example: 12.375₁₀
 1. Convert to binary: 1100.011₂
+   - Integer part: 12 = 1100₂
+   - Fractional part: 0.375 = 0.011₂
+     (0.375 × 2 = 0.75 → 0)
+     (0.75 × 2 = 1.5 → 1)
+     (0.5 × 2 = 1.0 → 1)
 2. Normalize: 1.100011 × 2³
 3. Sign: 0 (positive)
 4. Exponent: 3 + 127 = 130 = 10000010₂
-5. Mantissa: 10001100000000000000000
+5. Mantissa: 10001100000000000000000 (drop leading 1, pad with zeros)
 6. Result: 0 10000010 10001100000000000000000
 
 ### Special Values
 
-- Zero: All bits are 0
-- Infinity: Exponent all 1s, mantissa all 0s
-- NaN (Not a Number): Exponent all 1s, mantissa non-zero
+- **Zero**: All bits are 0 (note: -0 exists with sign bit = 1)
+- **Infinity**: Exponent all 1s, mantissa all 0s
+  - +∞: 0 11111111 00000000000000000000000
+  - -∞: 1 11111111 00000000000000000000000
+- **NaN (Not a Number)**: Exponent all 1s, mantissa non-zero
+  - Results from operations like 0/0, ∞-∞, sqrt(-1)
+- **Denormalized numbers**: Exponent all 0s, mantissa non-zero
+  - Allows representation of very small numbers near zero
+  - Value = (-1)^sign × 0.mantissa × 2^(-126)
 
 ## 1.7 Binary Coded Decimal (BCD)
 
@@ -241,6 +294,11 @@ IPv6 addresses use 128 bits, written in hexadecimal:
    - 42
    - 255
    - 1000
+   
+   **Solutions:**
+   - 42 = 101010₂
+   - 255 = 11111111₂
+   - 1000 = 1111101000₂
 
 2. Convert the following binary numbers to hexadecimal:
    - 11011110101011011011111011101111
@@ -270,9 +328,33 @@ IPv6 addresses use 128 bits, written in hexadecimal:
 
 8. Write a simple algorithm to convert any decimal number to binary.
 
+   **Solution approach:**
+   ```python
+   def decimal_to_binary(n):
+       if n == 0:
+           return '0'
+       binary = ''
+       while n > 0:
+           binary = str(n % 2) + binary
+           n = n // 2
+       return binary
+   ```
+
 9. Explain why computers use binary instead of decimal for internal representation.
 
+   **Key points to consider:**
+   - Electronic components naturally have two stable states
+   - Binary arithmetic circuits are simpler and faster
+   - Error detection and correction is more reliable
+   - Direct correspondence with Boolean logic
+
 10. Research and explain why floating-point arithmetic can lead to rounding errors in computers.
+
+   **Key concepts:**
+   - Limited precision (finite bits)
+   - Not all decimal fractions have exact binary representations
+   - Example: 0.1₁₀ = 0.00011001100110011...₂ (repeating)
+   - Accumulation of small errors in calculations
 
 ## Summary
 
